@@ -1,4 +1,4 @@
-(ns main
+(ns main-orig
   (:require
    [clojure.spec.alpha :as s]
    [reitit.coercion.spec :refer [coercion]]
@@ -54,5 +54,3 @@
                   (when old-server
                     (old-server))
                   (run-server (make-app) {:port 8081}))))
-
-(run)
