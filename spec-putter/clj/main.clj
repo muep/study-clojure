@@ -43,8 +43,8 @@
                                                        :count int?}}}}]]
     {:reitit.middleware/transform print-request-diffs
      :data {:coercion coercion
-            :middleware [coerce-request-middleware
-                         coerce-exceptions-middleware]}})))
+            :middleware [coerce-exceptions-middleware
+                         coerce-request-middleware]}})))
 
 (defn run []
   (swap! server (fn [old-server]

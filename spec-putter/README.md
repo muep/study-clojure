@@ -11,14 +11,33 @@ allows using the request parameters as described on the [Pluggable
 Coercion](https://cljdoc.org/d/metosin/reitit/0.5.18/doc/ring/pluggable-coercion)
 page.
 
+## Study log
+
+## 2022-08-19
+
+Difficult to remember where I was.
+
+Looks like I have somewhat working coercion for the path parameters,
+at least.
+
+Finally figured what coerce-exceptions-middleware does and how to
+install it.
+
+## Takeaways
+### coercion middleware ordering
+It makes sense how that I think about it, but one potential stumbling
+block is that `coerce-exceptions-middleware` has to be placed before
+e.g. `coerce-request-middleware`, or the former will not catch
+exceptions thrown in the later one.
+
 ## Data model
 
 The motivation for this exercise does not originate from
 [Spec](https://clojure.org/about/spec), even though it came up during
 familiarization with Spec. The actual impetus comes from problems with
-setting up a working Reitit Middleware stack that would use it. Still,
-some minimal data specification needs to be available to exercise the
-stack, so here we have something.
+setting up a working Reitit Middleware stack that would use it for
+message bodies. Still, some minimal data specification needs to be
+available to exercise the stack, so here we have something.
 
 Spec is imported from `clojure.spec.alpha` as `s`, with which we have
 these specifications.
@@ -109,4 +128,5 @@ these:
 So `:path-params` is present, but a combined `:parameters` is
 absent. This is not too surprising - the coercion is not yet
 installed, after all!
+
 
