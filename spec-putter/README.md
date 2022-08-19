@@ -13,7 +13,7 @@ page.
 
 ## Study log
 
-## 2022-08-19
+### 2022-08-19
 
 Difficult to remember where I was.
 
@@ -23,8 +23,55 @@ at least.
 Finally figured what coerce-exceptions-middleware does and how to
 install it.
 
+Now to get into request bodies, let's define a handler that simply
+echoes the body back to the caller:
+
+```clojure
+(defn echo-body [{{:keys [body]} :parameters}]
+  {:body body})
+```
+
+Now when installed with no type specs, such as in `["/echo-body" {:put
+{:handler echo-body}}]`, it seems that the body is not returned to the
+caller, further debugging indicates that the body parameter is
+actually `nil`, so clearly something needs to create it there. It
+seems quite likely that the coercion is expected to produce it.
+
+Let's add a coercion - maybe just tell that it is an `int`, so it now
+looks like:
+
+```clojure
+["/echo-body" {:put {:handler echo-body
+                     :parameters {:body int?}}}]
+```
+
+
+Now this gives an error like this (reformatted for easier reading):
+
+```
+[:spec "(spec-tools.core/spec {:spec clojure.core/int?, :type :long, :leaf? true})"]
+[:problems [{:path [], :pred "clojure.core/int?", :val nil, :via [], :in []}]]
+[:type :reitit.coercion/request-coercion]
+[:coercion :spec]
+[:value nil]
+[:in [:request :body-params]]
+```
+
+So looks like it wants to see a `:body-params` in the request, which
+is seemingly absent.
+
+By a quick look, at least
+[muuntaja](https://cljdoc.org/d/metosin/reitit/0.5.18/api/reitit.ring.middleware.muuntaja)
+is something that could create us a `:body-params`.
+
+Interestingly, adding `muuntaja.middleware/wrap-format` into the
+middleware chain did not fix this. It looks like `:body-params` is
+still missing.
+
+
+
 ## Takeaways
-### coercion middleware ordering
+### coercion exception middleware ordering
 It makes sense how that I think about it, but one potential stumbling
 block is that `coerce-exceptions-middleware` has to be placed before
 e.g. `coerce-request-middleware`, or the former will not catch
