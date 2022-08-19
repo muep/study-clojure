@@ -2,7 +2,6 @@
   (:require
    [clojure.spec.alpha :as s]
    [org.httpkit.server :refer [run-server]]
-   [reitit.ring.middleware.dev :refer [print-request-diffs]]
    [reitit.ring :as reitit-ring]
 
    [reitit.coercion.spec :refer [coercion]]
@@ -41,8 +40,7 @@
     [["/hello/:name/:count" {:get {:handler hello-name
                                    :parameters {:path {:name string?
                                                        :count int?}}}}]]
-    {:reitit.middleware/transform print-request-diffs
-     :data {:coercion coercion
+    {:data {:coercion coercion
             :middleware [coerce-exceptions-middleware
                          coerce-request-middleware]}})))
 
