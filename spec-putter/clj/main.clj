@@ -2,6 +2,7 @@
   (:require
    [clojure.spec.alpha :as s]
    [org.httpkit.server :refer [run-server]]
+   [reitit.ring.middleware.dev :refer [print-request-diffs]]
    [reitit.ring :as reitit-ring]
    [muuntaja.middleware :refer [wrap-format]]
 
@@ -48,7 +49,8 @@
                                                        :count int?}}}}]
      ["/echo-body" {:put {:handler echo-body
                           :parameters {:body int?}}}]]
-    {:data {:coercion coercion
+    {:reitit.middleware/transform print-request-diffs
+     :data {:coercion coercion
             :middleware [coerce-exceptions-middleware
                          wrap-format
                          coerce-request-middleware]}})))
