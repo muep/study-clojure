@@ -11,25 +11,10 @@
                                  coerce-request-middleware
                                  coerce-response-middleware]]))
 
-;; Data model
-(s/def ::title string?)
-(s/def ::description string?)
-(s/def ::version int?)
-
-(s/def ::foo
-  (s/keys :req-un [::title ::description ::version]))
-
-(s/def ::foo-update
-  (s/keys :req-opt [::title ::description]))
-
 (s/def ::answer int?)
 
 (s/def ::answer-object
   (s/keys :req-un [::answer]))
-
-(defonce foo (atom {:title "foo0"
-                    :description "The initial description of foo"
-                    :version 0}))
 
 ;; Http server
 (defonce server (atom nil))
