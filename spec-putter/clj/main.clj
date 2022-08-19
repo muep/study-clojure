@@ -6,7 +6,8 @@
    [reitit.ring :as reitit-ring]
    [muuntaja.middleware :refer [wrap-format]]
 
-   [reitit.coercion.spec :refer [coercion]]
+   [reitit.coercion :refer [compile-request-coercers]]
+   [reitit.coercion.spec :as spec-coercion]
    [reitit.ring.coercion :refer [coerce-exceptions-middleware
                                  coerce-request-middleware
                                  coerce-response-middleware]]))
@@ -21,6 +22,11 @@
 
 (s/def ::foo-update
   (s/keys :req-opt [::title ::description]))
+
+(s/def ::answer int?)
+
+(s/def ::answer-object
+  (s/keys :req-un [::answer]))
 
 (defonce foo (atom {:title "foo0"
                     :description "The initial description of foo"
@@ -37,7 +43,7 @@
   {:body (apply str (repeat count (str "Hello, " name "!\n")))})
 
 (defn echo-body [{{:keys [body]} :parameters}]
-  {:body body})
+  {:body (update body :answer str)})
 
 (defn toplevel-handler []
   (reitit-ring/ring-handler
@@ -48,12 +54,16 @@
                                    :parameters {:path {:name string?
                                                        :count int?}}}}]
      ["/echo-body" {:put {:handler echo-body
-                          :parameters {:body int?}}}]]
+                          :parameters {:body ::answer-object}
+                          :responses {200 {:body ::answer-object}}}}]]
     {:reitit.middleware/transform print-request-diffs
-     :data {:coercion coercion
-            :middleware [coerce-exceptions-middleware
-                         wrap-format
-                         coerce-request-middleware]}})))
+     :data {:coercion (spec-coercion/create (assoc spec-coercion/default-options
+                                                   :coerce-response? (fn [_] true)))
+            :compile compile-request-coercers
+            :middleware [wrap-format
+                         coerce-exceptions-middleware
+                         coerce-request-middleware
+                         coerce-response-middleware]}})))
 
 (defn run []
   (swap! server (fn [old-server]

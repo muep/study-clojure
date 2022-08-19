@@ -68,7 +68,15 @@ Interestingly, adding `muuntaja.middleware/wrap-format` into the
 middleware chain did not fix this. It looks like `:body-params` is
 still missing.
 
+It turns out, that the caller is required to declare the request as
+`Content-Type: application/json` or similar, or Muuntaja will just
+ignore the body. Maybe it makes sense.
 
+One final thing to fight with was the response coercion, after trying
+out all sorts of random stuff, I get the impression that Spec coercion
+just does not coerce responses. The
+[thread](https://github.com/metosin/reitit/issues/297) here kind of
+reinforces that belief.
 
 ## Takeaways
 ### coercion exception middleware ordering
@@ -76,6 +84,18 @@ It makes sense how that I think about it, but one potential stumbling
 block is that `coerce-exceptions-middleware` has to be placed before
 e.g. `coerce-request-middleware`, or the former will not catch
 exceptions thrown in the later one.
+
+### Interaction between request coercion, muuntaja ja content-type
+
+Request coercion needs:
+- `:body-params`, which in turn needs
+- Muuntaja (or maybe some other tool) which needs
+- `Content-Type` header in the request
+
+### Don't use spec if you wish to coerce responses
+
+Maybe this should not be a surprise, given that Spec intentionally has
+its "open" opinionated design.
 
 ## Data model
 
