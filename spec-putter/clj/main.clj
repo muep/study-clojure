@@ -37,7 +37,9 @@
 (defn toplevel-handler []
   (reitit-ring/ring-handler
    (reitit-ring/router
-    [["/hello/:name/:count" {:get {:handler hello-name
+    [["/hello/:name" {:get {:handler hello-name
+                            :parameters {:path {:name string?}}}}]
+     ["/hello/:name/:count" {:get {:handler hello-name
                                    :parameters {:path {:name string?
                                                        :count int?}}}}]]
     {:data {:coercion coercion
