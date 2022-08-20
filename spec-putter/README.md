@@ -91,6 +91,9 @@ separately. This however means, that one should always remember to set
 the status even for `200 OK` responses, instead of relying that some
 outer layer will fill it in.
 
+The earlier revelation - that spec coercion would not work for
+responses - turned out to be outright incorrect.
+
 ## Takeaways
 ### coercion exception middleware ordering
 It makes sense how that I think about it, but one potential stumbling
@@ -104,11 +107,6 @@ Request coercion needs:
 - `:body-params`, which in turn needs
 - Muuntaja (or maybe some other tool) which needs
 - `Content-Type` header in the request
-
-### Don't use spec if you wish to coerce responses
-
-Maybe this should not be a surprise, given that Spec intentionally has
-its "open" opinionated design.
 
 ### Always set response status explicitly
 
