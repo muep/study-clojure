@@ -6,10 +6,10 @@
    [muuntaja.middleware :refer [wrap-format]]
 
    [reitit.coercion :refer [compile-request-coercers]]
-   [reitit.coercion.spec :refer [coercion]]
    [reitit.ring.coercion :refer [coerce-exceptions-middleware
                                  coerce-request-middleware
-                                 coerce-response-middleware]]))
+                                 coerce-response-middleware]]
+   [reitit.coercion.spec :refer [coercion]]))
 
 (s/def ::answer int?)
 
