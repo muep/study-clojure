@@ -78,6 +78,19 @@ just does not coerce responses. The
 [thread](https://github.com/metosin/reitit/issues/297) here kind of
 reinforces that belief.
 
+### 2022-08-20
+
+Did a quick conversion to Schema coercion, in hopes of getting
+response coercion working as well. However, it turns out that also
+here we are not getting any response coercion. What is happening?
+
+It turns out that `coerce-response-middleware` will merrily ignore
+responses that do not have their `:status` set. This is not too
+surprising because the response schemas are set for each status code
+separately. This however means, that one should always remember to set
+the status even for `200 OK` responses, instead of relying that some
+outer layer will fill it in.
+
 ## Takeaways
 ### coercion exception middleware ordering
 It makes sense how that I think about it, but one potential stumbling
@@ -96,6 +109,14 @@ Request coercion needs:
 
 Maybe this should not be a surprise, given that Spec intentionally has
 its "open" opinionated design.
+
+### Always set response status explicitly
+
+At least `coerce-response-middleware` expects to see the status.
+
+If one wants to avoid having to set it manually for `200 OK` resposes,
+it would be easy to add a middleware that fills it in right after
+getting the response from the per-route handler.
 
 ## Data model
 
