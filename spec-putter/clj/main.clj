@@ -16,25 +16,21 @@
 ;; Http server
 (defonce server (atom nil))
 
-(def last-req (atom nil))
+(defn echo-bad [{{:keys [body]} :parameters}]
+  {:status 200
+   :body (update body :answer str)})
 
-(defn hello-name [{{{:keys [count name]
-                     :or {count 1}} :path} :parameters :as req}]
-  (reset! last-req req)
-  {:body (apply str (repeat count (str "Hello, " name "!\n")))})
-
-(defn echo-body [{{:keys [body]} :parameters}]
-  {:body (assoc body :answer-str (-> body :answer str))})
+(defn echo-good [{{:keys [body]} :parameters}]
+  {:status 200
+   :body body})
 
 (defn toplevel-handler []
   (reitit-ring/ring-handler
    (reitit-ring/router
-    [["/hello/:name" {:get {:handler hello-name
-                            :parameters {:path {:name s/Str}}}}]
-     ["/hello/:name/:count" {:get {:handler hello-name
-                                   :parameters {:path {:name s/Str
-                                                       :count s/Int}}}}]
-     ["/echo-body" {:put {:handler echo-body
+    [["/echo-good" {:put {:handler echo-good
+                          :parameters {:body Answer}
+                          :responses {200 {:body Answer}}}}]
+     ["/echo-bad" {:put {:handler echo-bad
                           :parameters {:body Answer}
                           :responses {200 {:body Answer}}}}]]
     {:data {:coercion coercion
