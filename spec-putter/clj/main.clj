@@ -1,6 +1,6 @@
 (ns main
   (:require
-   [clojure.spec.alpha :as s]
+   [schema.core :as s]
    [org.httpkit.server :refer [run-server]]
    [reitit.ring :as reitit-ring]
    [muuntaja.middleware :refer [wrap-format]]
@@ -9,12 +9,9 @@
    [reitit.ring.coercion :refer [coerce-exceptions-middleware
                                  coerce-request-middleware
                                  coerce-response-middleware]]
-   [reitit.coercion.spec :refer [coercion]]))
+   [reitit.coercion.schema :refer [coercion]]))
 
-(s/def ::answer int?)
-
-(s/def ::answer-object
-  (s/keys :req-un [::answer]))
+(def Answer {:answer s/Int})
 
 ;; Http server
 (defonce server (atom nil))
@@ -27,19 +24,19 @@
   {:body (apply str (repeat count (str "Hello, " name "!\n")))})
 
 (defn echo-body [{{:keys [body]} :parameters}]
-  {:body body})
+  {:body (assoc body :answer-str (-> body :answer str))})
 
 (defn toplevel-handler []
   (reitit-ring/ring-handler
    (reitit-ring/router
     [["/hello/:name" {:get {:handler hello-name
-                            :parameters {:path {:name string?}}}}]
+                            :parameters {:path {:name s/Str}}}}]
      ["/hello/:name/:count" {:get {:handler hello-name
-                                   :parameters {:path {:name string?
-                                                       :count int?}}}}]
+                                   :parameters {:path {:name s/Str
+                                                       :count s/Int}}}}]
      ["/echo-body" {:put {:handler echo-body
-                          :parameters {:body ::answer-object}
-                          :responses {200 {:body ::answer-object}}}}]]
+                          :parameters {:body Answer}
+                          :responses {200 {:body Answer}}}}]]
     {:data {:coercion coercion
             :compile compile-request-coercers
             :middleware [wrap-format
