@@ -5,5 +5,5 @@
   metosin/reitit-core {:mvn/version "0.5.18"}
   metosin/reitit-ring {:mvn/version "0.5.18"}
   metosin/reitit-middleware {:mvn/version "0.5.18"}
-  metosin/reitit-schema {:mvn/version "0.5.18"}
+  metosin/reitit-spec {:mvn/version "0.5.18"}
   metosin/muuntaja {:mvn/version "0.6.8"}}}

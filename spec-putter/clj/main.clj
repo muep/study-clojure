@@ -1,6 +1,6 @@
 (ns main
   (:require
-   [schema.core :as s]
+   [clojure.spec.alpha :as s]
    [org.httpkit.server :refer [run-server]]
    [reitit.ring :as reitit-ring]
    [muuntaja.middleware :refer [wrap-format]]
@@ -9,9 +9,12 @@
    [reitit.ring.coercion :refer [coerce-exceptions-middleware
                                  coerce-request-middleware
                                  coerce-response-middleware]]
-   [reitit.coercion.schema :refer [coercion]]))
+   [reitit.coercion.spec :refer [coercion]]))
 
-(def Answer {:answer s/Int})
+(s/def ::answer int?)
+
+(s/def ::answer-object
+  (s/keys :req-un [::answer]))
 
 ;; Http server
 (defonce server (atom nil))
@@ -28,11 +31,11 @@
   (reitit-ring/ring-handler
    (reitit-ring/router
     [["/echo-good" {:put {:handler echo-good
-                          :parameters {:body Answer}
-                          :responses {200 {:body Answer}}}}]
+                          :parameters {:body ::answer-object}
+                          :responses {200 {:body ::answer-object}}}}]
      ["/echo-bad" {:put {:handler echo-bad
-                          :parameters {:body Answer}
-                          :responses {200 {:body Answer}}}}]]
+                          :parameters {:body ::answer-object}
+                          :responses {200 {:body ::answer-object}}}}]]
     {:data {:coercion coercion
             :compile compile-request-coercers
             :middleware [wrap-format
