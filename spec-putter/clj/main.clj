@@ -49,4 +49,5 @@
                     (old-server))
                   (run-server (toplevel-handler) {:port 8081}))))
 
-(run)
+(defn -main [& _args]
+  (run))
